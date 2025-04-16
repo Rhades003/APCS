@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from typing import List
 
 from models.Card import Card
+from models.Offer import Offer
 from controllers.DBController import DBController
 import time
 import os
@@ -221,25 +222,33 @@ class CardController:
         else:
             DBController.insertCard(card)
 
+        
         driver.close()
 
     def getDeals(cardList):
         options = Options()
-        options.headless = True  # Set to True for headless mode
-        options.add_argument('--no-sandbox')  # Evita problemas con el sandboxing de Chrome
+        options.headless = True
+        #options.add_argument("--headless=new")  # Utiliza el nuevo modo headless
+        options.add_argument("--no-sandbox")  # Evita problemas con el sandboxing de Chrome
+        #options.add_argument("--disable-gpu")  # Desactiva la aceleración por GPU
+        options.add_argument("--window-size=1920,1080")  # Establece el tamaño de la ventana
 
-        
         driver = webdriver.Chrome(options=options)
+  
         for card in cardList:
             
             print(card[0])
+            print("aaaaaaa")
             title1:str = str(card[1])
             title1:str = title1.replace(" ", "-")
             
             driver.get("https://www.cardmarket.com/en/Magic/Cards/"+title1+"?sellerCountry=10&sellerType=1,2&language=1,4&minCondition=3")
             offerColumnList:List[WebElement] = driver.find_elements(By.CLASS_NAME, "row.g-0.article-row")
+            
+            print(offerColumnList)
 
             for i, column in enumerate(offerColumnList):
+                print(column)
                 sellerPart:WebElement = column.find_element(By.CLASS_NAME, "col-sellerProductInfo.col")
                 pricePart:WebElement = column.find_element(By.CLASS_NAME, "col-offer.col-auto")
 
@@ -288,7 +297,10 @@ class CardController:
                 pricePart3:WebElement = pricePart2.find_element(By.CLASS_NAME, "d-flex.flex-column")
                 pricePart4:WebElement = pricePart3.find_element(By.CLASS_NAME, "d-flex.align-items-center.justify-content-end")
                 price:str = pricePart4.find_element(By.CLASS_NAME, "color-primary.small.text-end.text-nowrap.fw-bold").text
-                priceFloat = float((price[0:(len(price)-2)]).replace(",", "."))
+                
+                priceClean = price[0:len(price)-2].replace(".", "").replace(",", ".")
+                priceFloat = float(priceClean)
+
                 print(price)
                 print(priceFloat)
 
@@ -296,6 +308,18 @@ class CardController:
                 quantity:WebElement = quantityPart2.find_element(By.CLASS_NAME, "item-count.small.text-end").text
 
                 print(quantity)
+                print("--------------------")
+                new_offer = Offer(
+                    expansion=expansion,
+                    seller=seller,
+                    quality=quality,
+                    price=priceFloat,
+                    quantity=quantity,
+                    bcn=bcn
+                )
+
+                # Insertar la oferta
+                DBController.insertOffer(new_offer, card[0])
 
 
 

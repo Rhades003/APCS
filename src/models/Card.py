@@ -1,5 +1,6 @@
 class Card:
     def __init__(self):
+        self.id = int
         self.title = [str]
         self.mana_cost = [str]
         self.type = [str]

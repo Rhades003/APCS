@@ -35,14 +35,27 @@ class DBController:
 
 
     @staticmethod
-    def insertOffer(offer:Offer, idCard):
+    def insertOffer(offer: Offer, idCard):
         mycursor = DBController.mydb.cursor()
-
+        print("idcard?")
+        print(idCard)
+        # Insertar en la tabla offers
         sql = "INSERT INTO offers (expansion, seller, quality, price, quantity, BCN) VALUES (%s, %s, %s, %s, %s, %s)"
         val = (offer.expansion, offer.seller, offer.quality, offer.price, offer.quantity, offer.bcn)
-    
         mycursor.execute(sql, val)
         offer_id = mycursor.lastrowid
+
+        # Insertar en la tabla cards_offers
+        sql_link = "INSERT INTO cards_offers (id_card, id_offer) VALUES (%s, %s)"
+        val_link = (idCard, offer_id)
+        mycursor.execute(sql_link, val_link)
+
+        # Confirmar los cambios
+        DBController.mydb.commit()
+
+        # Cerrar cursor
+        mycursor.close()
+
 
     @staticmethod
     def insertImg(id:int, link:str):
@@ -61,7 +74,7 @@ class DBController:
     def getCards():
         mycursor = DBController.mydb.cursor()
         
-        sql = "SELECT id,title,title_2,doble  FROM cards"
+        sql = "SELECT id, title, title_2, doble FROM cards WHERE id >= 9164 ORDER BY id ASC"
         mycursor.execute(sql)
 
         results = mycursor.fetchall()
