@@ -237,12 +237,20 @@ class CardController:
   
         for card in cardList:
             
-            print(card[0])
+            print(card)
             print("aaaaaaa")
             title1:str = str(card[1])
             title1:str = title1.replace(" ", "-")
-            
-            driver.get("https://www.cardmarket.com/en/Magic/Cards/"+title1+"?sellerCountry=10&sellerType=1,2&language=1,4&minCondition=3")
+            title1:str = title1.replace(",", "")
+            if (card[3]):
+                title2:str = str(card[2])
+                title2:str = title2.replace(" ", "-")
+                title2:str = title2.replace(",", "")
+                driver.get("https://www.cardmarket.com/en/Magic/Cards/"+title1+"-"+title2+"?sellerCountry=10&sellerType=1,2&language=1,4&minCondition=3")
+            else:    
+                driver.get("https://www.cardmarket.com/en/Magic/Cards/"+title1+"?sellerCountry=10&sellerType=1,2&language=1,4&minCondition=3")
+
+
             offerColumnList:List[WebElement] = driver.find_elements(By.CLASS_NAME, "row.g-0.article-row")
             
             print(offerColumnList)

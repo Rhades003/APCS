@@ -74,7 +74,7 @@ class DBController:
     def getCards():
         mycursor = DBController.mydb.cursor()
         
-        sql = "SELECT id, title, title_2, doble FROM cards WHERE id >= 9164 ORDER BY id ASC"
+        sql = "SELECT id, title, title_2, doble FROM cards WHERE id >= 26106 ORDER BY id ASC"
         mycursor.execute(sql)
 
         results = mycursor.fetchall()
